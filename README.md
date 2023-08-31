@@ -1,6 +1,3 @@
-Of course! Here's the template for your README file that you can copy and use directly. Just replace the placeholders with your actual project information:
-
-```markdown
 # Web Recon Tool
 
 This is a command-line web reconnaissance tool that supports various fuzzing modes to discover information about a target website.
