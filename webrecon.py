@@ -20,6 +20,7 @@ parser = parser.parse_args()
 
 def execute(command):
     try:
+        print(command)
         subprocess.run(command, shell=True)
     except subprocess.CalledProcessError as e:
         print(f"Command execution failed with return code {e.returncode}")
