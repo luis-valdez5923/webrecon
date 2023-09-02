@@ -11,6 +11,8 @@ parser.add_argument("-u", "--url", help="Target URL", dest="url")
 parser.add_argument("-w", "--wordlist", help="Wordlist", dest="wordlist")
 # filter
 parser.add_argument("-fs", help="filter size", dest="filtro")
+# Secure site
+parser.add_argument("--secure", help='is a secure site', action='store_true', dest='secure')
 # Output file
 parser.add_argument("-o", "--output", help="Output file", dest="output")
 
@@ -41,32 +43,47 @@ def buildCommand(command, output, filtro):
         command += f" -o {output}"
     return command
 
-def subdomains(target, wordlist, output, filtro):
-    command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u https://FUZZ.{target}/", output=output, filtro=filtro)
+def subdomains(target, wordlist, output, filtro, secure):
+    if secure:
+        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u https://FUZZ.{target}/", output=output, filtro=filtro)
+    else:
+        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u http://FUZZ.{target}/", output=output, filtro=filtro)
     print(f"Running subdomains fuzzing against {target}...")
     execute(command)
     print("Subdomains fuzzing completed.")
 
-def directories(target, wordlist, output, filtro):
-    command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u https://FUZZ.{target}/", output=output, filtro=filtro)
+def directories(target, wordlist, output, filtro, secure):
+    if secure:
+        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u https://FUZZ.{target}/", output=output, filtro=filtro)
+    else:
+        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u http://FUZZ.{target}/", output=output, filtro=filtro)
     print(f"Running directory fuzzing against {target}...")
     execute(command)
     print("Directory fuzzing completed.")
 
-def vhosts(target, wordlist, output, filtro):
-    command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u http://{target}/ -H 'Host: FUZZ.{target}'", output=output, filtro=filtro)
+def vhosts(target, wordlist, output, filtro, secure):
+    if secure:
+        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u https://{target}/ -H 'Host: FUZZ.{target}'", output=output, filtro=filtro)
+    else:
+        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u http://{target}/ -H 'Host: FUZZ.{target}'", output=output, filtro=filtro)
     print(f"Running VHost Fuzzing against {target}...")
     execute(command)
     print("VHost Fuzzing completed.")
 
-def extension(target, wordlist, output, filtro):
-    command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u http://{target}/indexFUZZ", output=output, filtro=filtro)
+def extension(target, wordlist, output, filtro, secure):
+    if secure:
+        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u https://{target}/indexFUZZ", output=output, filtro=filtro)
+    else:
+        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u http://{target}/indexFUZZ", output=output, filtro=filtro)
     print(f"Running extension Fuzzing against {target}...")
     execute(command)
     print("VHost extension completed.")
 
-def page(target, wordlist, output, filtro):
-    command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u http://{target}/FUZZ.php", output=output, filtro=filtro)
+def page(target, wordlist, output, filtro, secure):
+    if secure:
+        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u https://{target}/FUZZ.php", output=output, filtro=filtro)
+    else:
+        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u http://{target}/FUZZ.php", output=output, filtro=filtro)
     print(f"Running page Fuzzing against {target}...")
     execute(command)
     print("VHost page completed.")
@@ -74,15 +91,15 @@ def page(target, wordlist, output, filtro):
 def main():
     match parser.mode:
         case "subdomains":
-            subdomains(parser.url, parser.wordlist, parser.output, parser.filtro)
+            subdomains(parser.url, parser.wordlist, parser.output, parser.filtro, parser.secure)
         case "dir":
-            directories(parser.url, parser.wordlist, parser.output, parser.filtro)
+            directories(parser.url, parser.wordlist, parser.output, parser.filtro, parser.secure)
         case "vhost":
-            vhosts(parser.url, parser.wordlist, parser.output, parser.filtro)
+            vhosts(parser.url, parser.wordlist, parser.output, parser.filtro, parser.secure)
         case "ext":
-            extension(parser.url, parser.wordlist, parser.output, parser.filtro)
+            extension(parser.url, parser.wordlist, parser.output, parser.filtro, parser.secure)
         case "page":
-            page(parser.url, parser.wordlist, parser.output, parser.filtro)
+            page(parser.url, parser.wordlist, parser.output, parser.filtro, parser.secure)
         case _:
             print("Invalid mode specified")
 
