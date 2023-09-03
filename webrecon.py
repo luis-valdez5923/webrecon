@@ -55,9 +55,9 @@ def subdomains(target, wordlist, output, filtro, secure):
 
 def directories(target, wordlist, output, filtro, secure):
     if secure:
-        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u https://FUZZ.{target}/", output=output, filtro=filtro)
+        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u https://{target}/FUZZ", output=output, filtro=filtro)
     else:
-        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u http://FUZZ.{target}/", output=output, filtro=filtro)
+        command = buildCommand(f"ffuf -w {wordlist}:FUZZ -u http://{target}/FUZZ", output=output, filtro=filtro)
     print(f"Running directory fuzzing against {target}...")
     execute(command)
     print("Directory fuzzing completed.")
